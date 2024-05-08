@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 from datetime import datetime
 
 
@@ -15,7 +16,7 @@ def clear_log():
 
 
 def virus_find(directory):
-    for root, dirs, files in os.walk(CHECK_DIRECTORY):
+    for root, dirs, files in os.walk(directory):
         for name in files:
             file = os.path.join(root, name)
             if check(file):
@@ -49,4 +50,8 @@ def add_to_log(file):
 
 if __name__ == '__main__':
     clear_log()
-    virus_find(CHECK_DIRECTORY)
+    if len(sys.argv) > 1:
+        directory = sys.argv[1]
+        virus_find(directory)
+    else:
+        virus_find(CHECK_DIRECTORY)
