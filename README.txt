@@ -14,5 +14,7 @@
 
 # pip install pillow            -   работа с изображением
 
+# pip install google-api-python-client      -   Клиентская библиотека API Google для Python
 
+# pip install paramiko - ssh client
 
