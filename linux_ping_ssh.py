@@ -25,17 +25,34 @@ def ping_host(ip_address):
 #         if ping_host(ip_address):
 #             print(f"Хост доступен {ip_address}")
 
-ip_address = '192.168.101.232'
+ip_address = '192.168.102.16'
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect(hostname=ip_address, port=22, username='root', password='iemo@333@')
+ssh.connect(hostname=ip_address, port=22, username='root', password='12345678')
 
-stdin, stdout, stderr = ssh.exec_command('shutdown -h now')
+stdin, stdout, stderr = ssh.exec_command('sudo dnf install wine -y')
 stdin.write('Входные данные')
 stdin.flush()
 
+print("_______________install wine_________________")
+result = stdout.read().decode('utf-8')
+print(result)
+
+
+# wine --version
+stdin, stdout, stderr = ssh.exec_command('wine --version')
+stdin.write('Входные данные')
+stdin.flush()
+
+print("_______________wine --version_________________")
 result = stdout.read().decode('utf-8')
 print(result)
 
 ssh.close()
+
+"""         Фон рабочего стола
+gsettings set org.mate.background picture-filename '/home/dgmu/Загрузки/girl-beauty-girl-smile-wallpaper-preview.jpg'
+"""
+
+
