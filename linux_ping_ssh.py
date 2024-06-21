@@ -29,34 +29,35 @@ def ping_host(ip_address):
 
 
 def ssh_command_to_host(ip_host, command, title=None):
-    if title!=None:
-        print(title)
-    stdin, stdout, stderr = ssh.exec_command(command)
-    stdin.write('Входные данные')
-    stdin.flush()
+    try:
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=ip_address, port=22, username='root', password='12345678')
 
-    result = stdout.read().decode('utf-8')
-    return result
+        if title:
+            print(title)
+        stdin, stdout, stderr = ssh.exec_command(command)
+        stdin.write('Входные данные')
+        stdin.flush()
 
-ip_address = '192.168.102.16'
+        result = stdout.read().decode('utf-8')
+        ssh.close()
+        print(result)
 
-try:
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname=ip_address, port=22, username='root', password='12345678')
-except NoValidConnectionsError:
-    print(1111)
-    exit(0)
-
-
-ssh_wine = ssh_command_to_host(ip_host=ip_address, command="wine --version")
-if ssh_wine.startswith('wine'):
-    print(ssh_wine)
-else:
-    ssh_command_to_host(ip_host=ip_address, command='sudo dnf install wine -y', title="install wine")
+    except NoValidConnectionsError:
+        print(f"Failed to connect {ip_host}")
 
 
-ssh.close()
+def main():
+    ip_address = '192.168.102.16'
+    # ping_host(ip_address)
+    ssh_command_to_host(ip_host=ip_address, command="sudo dnf install wine -y", title="install wine")
+
+
+if __name__ == '__main__':
+    main()
+
+
 
 """         Фон рабочего стола
 gsettings set org.mate.background picture-filename '/home/dgmu/Загрузки/girl-beauty-girl-smile-wallpaper-preview.jpg'
