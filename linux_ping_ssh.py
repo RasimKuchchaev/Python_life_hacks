@@ -2,6 +2,8 @@
 
 import subprocess
 import paramiko
+from paramiko.ssh_exception import NoValidConnectionsError
+
 
 def ping_host(ip_address):
     try:
@@ -25,29 +27,34 @@ def ping_host(ip_address):
 #         if ping_host(ip_address):
 #             print(f"Хост доступен {ip_address}")
 
+
+def ssh_command_to_host(ip_host, command, title=None):
+    if title!=None:
+        print(title)
+    stdin, stdout, stderr = ssh.exec_command(command)
+    stdin.write('Входные данные')
+    stdin.flush()
+
+    result = stdout.read().decode('utf-8')
+    return result
+
 ip_address = '192.168.102.16'
 
-ssh = paramiko.SSHClient()
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect(hostname=ip_address, port=22, username='root', password='12345678')
-
-stdin, stdout, stderr = ssh.exec_command('sudo dnf install wine -y')
-stdin.write('Входные данные')
-stdin.flush()
-
-print("_______________install wine_________________")
-result = stdout.read().decode('utf-8')
-print(result)
+try:
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(hostname=ip_address, port=22, username='root', password='12345678')
+except NoValidConnectionsError:
+    print(1111)
+    exit(0)
 
 
-# wine --version
-stdin, stdout, stderr = ssh.exec_command('wine --version')
-stdin.write('Входные данные')
-stdin.flush()
+ssh_wine = ssh_command_to_host(ip_host=ip_address, command="wine --version")
+if ssh_wine.startswith('wine'):
+    print(ssh_wine)
+else:
+    ssh_command_to_host(ip_host=ip_address, command='sudo dnf install wine -y', title="install wine")
 
-print("_______________wine --version_________________")
-result = stdout.read().decode('utf-8')
-print(result)
 
 ssh.close()
 
