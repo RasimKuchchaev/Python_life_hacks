@@ -96,6 +96,19 @@ if __name__ == '__main__':
 gsettings set org.mate.background picture-filename '/home/dgmu/Загрузки/girl-beauty-girl-smile-wallpaper-preview.jpg'
 """
 
-# scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/medacad/medic/ root@192.168.102.16:'/home/dgmu/Рабочий\ стол/medic/'
+# scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/medacad/medic/ root@192.168.102.16:'/home/dgmu/.wine/drive_c/Program\ Files\ (x86)/medic'
+
+# MUC.desktop
+#
+# #!/usr/bin/env xdg-open
+# [Desktop Entry]
+# Version=1.0
+# Type=Application
+# Terminal=false
+# Exec=bash -c 'cd "/home/dgmu/.wine/drive_c/Program Files (x86)/medic/"; wine ./MUC.exe'
+# Name[ru_RU]=MUC
+# Icon=/home/dgmu/.wine/drive_c/Program Files (x86)/medic/1.ico
+# Icon[ru_RU]=/home/dgmu/.wine/drive_c/Program Files (x86)/medic/1.ico
+# Name=MUC
 
 
