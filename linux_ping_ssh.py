@@ -27,9 +27,6 @@ async def search_host_to_network_asyncio(subnet_start, subnet_stop):
             for j in range(1, 255)]
     await asyncio.gather(*task)
 
-# if __name__ == '__main__':
-#     asyncio.run(search_host_to_network_asyncio(96, 102))
-
 # def ping_host(ip_address):
 #     output = os.system('ping -c 1 ' + ip_address)
 #     if output == 0:
@@ -38,13 +35,6 @@ async def search_host_to_network_asyncio(subnet_start, subnet_stop):
 #     else:
 #         print(f"{output} Хост не доступен")
 #         return False
-
-
-    # try:
-    #     output = subprocess.check_output(['ping', '-c', '1', ip_address])
-    #     return True
-    # except subprocess.CalledProcessError:
-    #     return False
 
 
 # def search_host_to_network(subnet_start, subnet_stop):
@@ -59,7 +49,7 @@ def ssh_command_to_host(ip_host, command):
     try:
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip_host, port=22, username= LOGIN_SSH, password=PASSWORD_SSH)
+        ssh.connect(hostname=ip_host, port=22, username=LOGIN_SSH, password=PASSWORD_SSH)
 
         stdin, stdout, stderr = ssh.exec_command(command)
         stdin.write('Входные данные')
@@ -87,8 +77,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-
+    # main()
+    # ssh_command_to_host(ip_host="192.168.102.16", command="sudo dnf install wine -y")
+    ssh_command_to_host(ip_host="192.168.102.16", command="winecfg")
+    ssh_command_to_host(ip_host="192.168.102.16", command="scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/BF/medic root@192.168.102.16:'/home/dgmu/.wine/drive_c/Program\ Files\ \(x86\)/medic'")
 
 
 
@@ -96,7 +88,7 @@ if __name__ == '__main__':
 gsettings set org.mate.background picture-filename '/home/dgmu/Загрузки/girl-beauty-girl-smile-wallpaper-preview.jpg'
 """
 
-# scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/medacad/medic/ root@192.168.102.16:'/home/dgmu/.wine/drive_c/Program\ Files\ (x86)/medic'
+# scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/BF/medic root@192.168.102.16:'/home/dgmu/.wine/drive_c/Program\ Files\ (x86)/medic'
 
 # MUC.desktop
 #
