@@ -1,3 +1,9 @@
+"""
+После установки PyCharm пользователи часто сталкиваются с тем, что терминал выдаёт сообщение о том, что невозможно загрузить файл ….ps1, так как выполнение сценариев отключено в этой системе.
+Для решения этой проблемы необходимо открыть от имени администратора PowerShell, ввести Get-ExecutionPolicy и если в ответе получите Restricted , то нужно ввести Set-ExecutionPolicy unrestricted и далее для подтверждения действия нажать Y.
+"""
+
+
 # pip install pymorphy2 - изменение текста в определеный падеж
 # https://pymorphy2.readthedocs.io/en/stable/
 # Морфологический анализатор
@@ -18,3 +24,6 @@
 
 # pip install paramiko - ssh client
 
+# pip install pytube            -   download youtube
+https://www.ffmpeg.org/         -   обьединение видео и аудио файла в один файл
+# pip install ffmpeg-python
