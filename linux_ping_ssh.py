@@ -1,8 +1,8 @@
 # pip install paramiko - ssh client
+# pip install pexpect
 
-import os
-import subprocess
-
+from time import sleep
+import pexpect
 import asyncio
 import aioping
 import paramiko
@@ -10,9 +10,12 @@ from paramiko.ssh_exception import NoValidConnectionsError, SSHException
 
 IP_ADDRESS = '192.168.102.16'
 IP_LIST = []
+IP_LIST_BASE = []
 
-LOGIN_SSH = 'root'
+LOGIN_SSH_ROOT = 'root'
+LOGIN_SSH_DGMU = 'dgmu'
 PASSWORD_SSH = '12345678'
+
 
 async def ping_host_asyncio(ip):
     try:
@@ -27,29 +30,12 @@ async def search_host_to_network_asyncio(subnet_start, subnet_stop):
             for j in range(1, 255)]
     await asyncio.gather(*task)
 
-# def ping_host(ip_address):
-#     output = os.system('ping -c 1 ' + ip_address)
-#     if output == 0:
-#         print(f"Хост доступен {output}")
-#         return True
-#     else:
-#         print(f"{output} Хост не доступен")
-#         return False
-
-
-# def search_host_to_network(subnet_start, subnet_stop):
-#     for i in range(subnet_start, subnet_stop + 1):
-#         for j in range(1, 255):
-#             ip_address = "192.168." + str(i) + "." + str(j)
-#             if ping_host(ip_address):
-#                 print(f"Хост доступен {ip_address}")
-
 
 def ssh_command_to_host(ip_host, command):
     try:
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip_host, port=22, username=LOGIN_SSH, password=PASSWORD_SSH)
+        ssh.connect(hostname=ip_host, port=22, username=LOGIN_SSH_DGMU, password=PASSWORD_SSH)
 
         stdin, stdout, stderr = ssh.exec_command(command)
         stdin.write('Входные данные')
@@ -58,7 +44,8 @@ def ssh_command_to_host(ip_host, command):
         result = stdout.read().decode('utf-8')
         ssh.close()
         print(f"--------INFO--------IP-{ip_host}-------{command}--------")
-        # print(result)
+        IP_LIST_BASE.append(ip_host)
+        # return result
 
     except NoValidConnectionsError:
         print(f"Failed to connect {ip_host}")
@@ -67,20 +54,35 @@ def ssh_command_to_host(ip_host, command):
     except TimeoutError:
         print(f"TimeoutError123 {ip_host}")
 
+def ssh_command_X11_forward(ip_address):
+    # Запуск ssh -X
+    child = pexpect.spawn(f'ssh -X {LOGIN_SSH_DGMU}@{ip_address}')
+    child.expect('password:')
+    child.sendline(PASSWORD_SSH)  # Вставьте ваш пароль
+    child.expect('[dgmu@localhost ~]$')  # Ожидайте приглашения командной строки
+
+    # Выполнение команд
+    child.sendline('winecfg')  # Выполняем команду на сервере
+    sleep(30)
+    child.close()  # Завершаем SSH-соединение
+
 
 def main():
     asyncio.run(search_host_to_network_asyncio(96, 102))
-    # ping_host(ip_address)
-    # search_host_to_network(subnet_start=96, subnet_stop=102)
     for ip_addr in IP_LIST:
-        ssh_command_to_host(ip_host=ip_addr, command="sudo dnf install wine -y")
+        ssh_command_to_host(ip_host=ip_addr, command="uname -a")
+    print(IP_LIST_BASE)
 
 
 if __name__ == '__main__':
     # main()
+    my_list = ['192.168.96.195', '192.168.96.226']
+    for item in my_list:
+        ssh_command_X11_forward(item)
+    # ssh_command_X11_forward('192.168.96.195')
     # ssh_command_to_host(ip_host="192.168.102.16", command="sudo dnf install wine -y")
-    ssh_command_to_host(ip_host="192.168.102.16", command="winecfg")
-    ssh_command_to_host(ip_host="192.168.102.16", command="scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/BF/medic root@192.168.102.16:'/home/dgmu/.wine/drive_c/Program\ Files\ \(x86\)/medic'")
+    # ssh_command_to_host(ip_host="192.168.102.16", command="winecfg")
+    # ssh_command_to_host(ip_host="192.168.102.16", command="scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/BF/medic root@192.168.102.16:'/home/dgmu/.wine/drive_c/Program\ Files\ \(x86\)/medic'")
 
 
 
