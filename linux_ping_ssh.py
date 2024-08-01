@@ -1,6 +1,7 @@
 # pip install paramiko - ssh client
-# pip install pexpect
+# pip install pexpect   -   - ssh X11 forwarding
 
+import os
 from time import sleep
 import pexpect
 import asyncio
@@ -8,9 +9,8 @@ import aioping
 import paramiko
 from paramiko.ssh_exception import NoValidConnectionsError, SSHException
 
-IP_ADDRESS = '192.168.102.16'
+
 IP_LIST = []
-IP_LIST_BASE = []
 
 LOGIN_SSH_ROOT = 'root'
 LOGIN_SSH_DGMU = 'dgmu'
@@ -25,13 +25,14 @@ async def ping_host_asyncio(ip):
     except TimeoutError:
         print(f"{ip}: Ping timeout")
 
+
 async def search_host_to_network_asyncio(subnet_start, subnet_stop):
     task = [ping_host_asyncio("192.168." + str(i) + "." + str(j)) for i in range(subnet_start, subnet_stop + 1)
             for j in range(1, 255)]
     await asyncio.gather(*task)
 
 
-def ssh_command_to_host(ip_host, command):
+def ssh_command_to_host(ip_host, command, hosts_txt_create=False):
     try:
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -44,8 +45,9 @@ def ssh_command_to_host(ip_host, command):
         result = stdout.read().decode('utf-8')
         ssh.close()
         print(f"--------INFO--------IP-{ip_host}-------{command}--------")
-        IP_LIST_BASE.append(ip_host)
-        # return result
+        if hosts_txt_create:
+            with open('hosts.txt', 'a',) as file:
+                file.write(f'{ip_host}\n')
 
     except NoValidConnectionsError:
         print(f"Failed to connect {ip_host}")
@@ -53,6 +55,7 @@ def ssh_command_to_host(ip_host, command):
         print(f"No existing session {ip_host}")
     except TimeoutError:
         print(f"TimeoutError123 {ip_host}")
+
 
 def ssh_command_X11_forward(ip_address):
     # Запуск ssh -X
@@ -68,17 +71,25 @@ def ssh_command_X11_forward(ip_address):
 
 
 def main():
+    if os.path.exists("hosts.txt"):
+        os.remove("hosts.txt")
     asyncio.run(search_host_to_network_asyncio(96, 102))
+
     for ip_addr in IP_LIST:
-        ssh_command_to_host(ip_host=ip_addr, command="uname -a")
-    print(IP_LIST_BASE)
+        ssh_command_to_host(ip_host=ip_addr, command="uname -a", hosts_txt_create=True)
+
+    with open('hosts.txt', 'r') as file:
+        load_host_txt = file.readlines()
+
+    for ip_item in load_host_txt:
+        ip_item = ip_item.rstrip('\n')
 
 
 if __name__ == '__main__':
-    # main()
-    my_list = ['192.168.96.195', '192.168.96.226']
-    for item in my_list:
-        ssh_command_X11_forward(item)
+    main()
+
+    # for item in my_list:
+    #     ssh_command_X11_forward(item)
     # ssh_command_X11_forward('192.168.96.195')
     # ssh_command_to_host(ip_host="192.168.102.16", command="sudo dnf install wine -y")
     # ssh_command_to_host(ip_host="192.168.102.16", command="winecfg")
