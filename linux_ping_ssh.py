@@ -1,6 +1,9 @@
-# pip install paramiko - ssh client
-# pip install pexpect   -   - ssh X11 forwarding
+# pip install paramiko          - ssh client
+# pip install pexpect           - ssh X11 forwarding
+# pip install aioping           - aioping
+# pip install ansible-runner    - ansible
 
+import ansible_runner
 import os
 from time import sleep
 import pexpect
@@ -57,7 +60,7 @@ def ssh_command_to_host(ip_host, command, hosts_txt_create=False):
         print(f"TimeoutError123 {ip_host}")
 
 
-def ssh_command_X11_forward(ip_address):
+def ssh_command_X11_forward(ip_address, commandX11):
     # Запуск ssh -X
     child = pexpect.spawn(f'ssh -X {LOGIN_SSH_DGMU}@{ip_address}')
     child.expect('password:')
@@ -65,7 +68,7 @@ def ssh_command_X11_forward(ip_address):
     child.expect('[dgmu@localhost ~]$')  # Ожидайте приглашения командной строки
 
     # Выполнение команд
-    child.sendline('winecfg')  # Выполняем команду на сервере
+    child.sendline(commandX11)  # Выполняем команду на сервере
     sleep(30)
     child.close()  # Завершаем SSH-соединение
 
@@ -78,21 +81,24 @@ def main():
     for ip_addr in IP_LIST:
         ssh_command_to_host(ip_host=ip_addr, command="uname -a", hosts_txt_create=True)
 
+    r = ansible_runner.run(private_data_dir='/etc/ansible', playbook='playbook1.yml',
+                           status_handler=my_ansible_status_handler)
+
     with open('hosts.txt', 'r') as file:
         load_host_txt = file.readlines()
 
     for ip_item in load_host_txt:
         ip_item = ip_item.rstrip('\n')
+        ssh_command_X11_forward(ip_item, 'winecfg')
+
+
+def my_ansible_status_handler(data, runner_config):
+    print(data)
 
 
 if __name__ == '__main__':
     main()
 
-    # for item in my_list:
-    #     ssh_command_X11_forward(item)
-    # ssh_command_X11_forward('192.168.96.195')
-    # ssh_command_to_host(ip_host="192.168.102.16", command="sudo dnf install wine -y")
-    # ssh_command_to_host(ip_host="192.168.102.16", command="winecfg")
     # ssh_command_to_host(ip_host="192.168.102.16", command="scp -r /mnt/a1056def-4df1-4959-9904-5b654aed0dfd/Soft/Rasim/BF/medic root@192.168.102.16:'/home/dgmu/.wine/drive_c/Program\ Files\ \(x86\)/medic'")
 
 
